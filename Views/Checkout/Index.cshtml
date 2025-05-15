@@ -1,0 +1,184 @@
+@model Spode.Models.CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Checkout";
+    var cartItems = ViewBag.CartItems as List<Spode.Models.CartItem>;
+    var totalPrice = ViewBag.TotalPrice as decimal?;
+}
+
+<div class="container mt-4">
+    <h1>Оформление</h1>
+    
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    <div class="row">
+        <!-- Order Summary -->
+        <div class="col-md-4 order-md-2 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Сумма заказа</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group mb-3">
+                        @foreach (var item in cartItems)
+                        {
+                            <li class="list-group-item d-flex justify-content-between lh-sm">
+                                <div>
+                                    <h6 class="my-0">@item.Product.Name</h6>
+                                    <small class="text-muted">Quantity: @item.Quantity</small>
+                                </div>
+                                <span class="text-muted">@((item.Product.Price * item.Quantity).ToString("C"))</span>
+                            </li>
+                        }
+                        <li class="list-group-item d-flex justify-content-between bg-light">
+                            <div class="text-success">
+                                <h6 class="my-0">Пр.сумма</h6>
+                            </div>
+                            <span class="text-success">@totalPrice?.ToString("C")</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Сумма</span>
+                            <strong>@totalPrice?.ToString("C")</strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-arrow-left me-1"></i> Назад в корзину
+                </a>
+            </div>
+        </div>
+        
+        <!-- Checkout Form -->
+        <div class="col-md-8 order-md-1">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Данные</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="PlaceOrder" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <h5 class="mb-3"></h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-12">
+                                <label asp-for="FullName" class="form-label"></label>
+                                <input asp-for="FullName" class="form-control" />
+                                <span asp-validation-for="FullName" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label"></label>
+                                <input asp-for="Email" class="form-control" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label"></label>
+                                <input asp-for="PhoneNumber" class="form-control" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <h5 class="mb-3">Shipping Address</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-12">
+                                <label asp-for="AddressLine1" class="form-label"></label>
+                                <input asp-for="AddressLine1" class="form-control" />
+                                <span asp-validation-for="AddressLine1" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label asp-for="AddressLine2" class="form-label"></label>
+                                <input asp-for="AddressLine2" class="form-control" />
+                                <span asp-validation-for="AddressLine2" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-5">
+                                <label asp-for="City" class="form-label"></label>
+                                <input asp-for="City" class="form-control" />
+                                <span asp-validation-for="City" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label asp-for="State" class="form-label"></label>
+                                <input asp-for="State" class="form-control" />
+                                <span asp-validation-for="State" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label asp-for="PostalCode" class="form-label"></label>
+                                <input asp-for="PostalCode" class="form-control" />
+                                <span asp-validation-for="PostalCode" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label asp-for="Country" class="form-label"></label>
+                                <!-- Hide the model-bound dropdown to avoid validation issues -->
+                                <input asp-for="Country" type="hidden" value="Russia" />
+                                
+                                <!-- Manual dropdown that updates the hidden field -->
+                                <select id="CountryDropdown" class="form-select" onchange="document.getElementById('Country').value = this.value">
+                                    <option value="Russia">Россия</option>
+                                    <option value="Belarus">Беларусь</option>
+                                    <option value="Kazahstan">Казахстан</option>                                  
+                                </select>
+                                <span asp-validation-for="Country" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <h5 class="mb-3">Payment Information</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" asp-for="PaymentMethod" id="cashOnDelivery" value="CashOnDelivery" checked />
+                                    <label class="form-check-label" for="cashOnDelivery">
+                                        Cash on Delivery
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" asp-for="PaymentMethod" id="creditCard" value="CreditCard" disabled />
+                                    <label class="form-check-label" for="creditCard">
+                                        Credit Card (Coming Soon)
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" asp-for="PaymentMethod" id="paypal" value="PayPal" disabled />
+                                    <label class="form-check-label" for="paypal">
+                                        PayPal (Coming Soon)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label asp-for="OrderNotes" class="form-label"></label>
+                            <textarea asp-for="OrderNotes" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="OrderNotes" class="text-danger"></span>
+                        </div>
+                        
+                        <hr class="my-4" />
+                        
+                        <button class="btn btn-primary btn-lg w-100" type="submit">
+                            <i class="fas fa-credit-card me-2"></i> Place Order
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

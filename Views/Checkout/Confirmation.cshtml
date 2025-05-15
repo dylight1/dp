@@ -1,0 +1,93 @@
+@model Spode.Models.Order
+
+@{
+    ViewData["Title"] = "Order Confirmation";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h2 class="mb-0"><i class="fas fa-check-circle me-2"></i> Order Confirmed!</h2>
+                </div>
+                <div class="card-body">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success mb-4">
+                            @TempData["Success"]
+                        </div>
+                    }
+                    
+                    <h4 class="mb-3">Спасибо за заказ!</h4>                                    
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Данные заказа</h5>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row">
+                                <dt class="col-sm-4">Номер:</dt>
+                                <dd class="col-sm-8">#@Model.Id</dd>
+                                
+                                <dt class="col-sm-4">Дата:</dt>
+                                <dd class="col-sm-8">@Model.OrderDate.ToString("MMM dd, yyyy HH:mm")</dd>
+                                
+                                <dt class="col-sm-4">Статус:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-info">@Model.Status</span>
+                                </dd>
+                                
+                                <dt class="col-sm-4">Сумма:</dt>
+                                <dd class="col-sm-8">@Model.TotalPrice.ToString("C")</dd>
+                            </dl>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Детали заказа</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Продукт</th>
+                                            <th>Цена</th>
+                                            <th>Количество</th>
+                                            <th class="text-end">Сумма</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.OrderItems)
+                                        {
+                                            <tr>
+                                                <td>@item.ProductName</td>
+                                                <td>@item.ProductPrice.ToString("C")</td>
+                                                <td>@item.Quantity</td>
+                                                <td class="text-end">@((item.ProductPrice * item.Quantity).ToString("C"))</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="3" class="text-end">Общая сумма :</th>
+                                            <th class="text-end">@Model.TotalPrice.ToString("C")</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                                        
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                            <i class="fas fa-home me-1"></i> На главную
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

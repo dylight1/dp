@@ -1,0 +1,86 @@
+@model Spode.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Edit User";
+    var roleManager = ViewBag.AvailableRoles as List<Microsoft.AspNetCore.Identity.IdentityRole>;
+}
+
+<div class="container-fluid">
+    <h1 class="mt-4">Edit User</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-user-edit me-1"></i>
+            Edit User Information
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                
+                <div class="row">
+                    <div class="col-md-3 text-center mb-3">
+                        @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+                        {
+                            <img src="@Model.ProfilePicture" alt="@Model.Name" class="img-thumbnail rounded-circle" style="width: 200px; height: 200px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <img src="/images/no-user-image.png" alt="@Model.Name" class="img-thumbnail rounded-circle" style="width: 200px; height: 200px; object-fit: cover;" />
+                        }
+                    </div>
+                    <div class="col-md-9">
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Name</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Roles</label>
+                            <div>
+                                @if (roleManager != null)
+                                {
+                                    @foreach (var role in roleManager)
+                                    {
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" id="role_@role.Id" 
+                                                   name="selectedRoles" value="@role.Name" 
+                                                   @(Model.Roles != null && Model.Roles.Contains(role.Name) ? "checked" : "") />
+                                            <label class="form-check-label" for="role_@role.Id">@role.Name</label>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-3">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

@@ -1,0 +1,102 @@
+@model Spode.Models.Product
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="row">
+                <!-- Product Image -->
+                <div class="col-md-5 mb-4">
+                    <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/no-product-image.png" : Model.ImageUrl)" 
+                         alt="@Model.Name" 
+                         class="img-fluid rounded" 
+                         style="max-height: 400px; width: 100%; object-fit: cover;">
+                </div>
+                
+                <!-- Product Details -->
+                <div class="col-md-7">
+                    <h1 class="mb-3">@Model.Name</h1>
+                    
+                    <div class="mb-3">
+                        <h4 class="text-primary">@Model.Price.ToString("C")</h4>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Availability:</strong></p>
+                        @if (Model.StockQuantity > 10)
+                        {
+                            <span class="badge bg-success">In Stock (@Model.StockQuantity available)</span>
+                        }
+                        else if (Model.StockQuantity > 0)
+                        {
+                            <span class="badge bg-warning">Low Stock (@Model.StockQuantity left)</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Out of Stock</span>
+                        }
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Description</h5>
+                        <p>@(string.IsNullOrEmpty(Model.Description) ? "No description available." : Model.Description)</p>
+                    </div>
+                    
+                    @if (Model.StockQuantity > 0)
+                    {
+                        <div class="d-grid gap-2 d-md-flex">
+                            <div class="input-group me-3" style="width: 130px;">
+                                <span class="input-group-text">Qty</span>
+                                <input type="number" id="quantity" class="form-control" value="1" min="1" max="@Model.StockQuantity">
+                            </div>
+                            <button type="button" class="btn btn-primary add-to-cart" data-id="@Model.Id">
+                                <i class="fas fa-shopping-cart me-1"></i> Add to Cart
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-secondary" disabled>
+                            <i class="fas fa-shopping-cart me-1"></i> Out of Stock
+                        </button>
+                    }
+                    
+                    <div class="mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Products
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Remove the click handler as it's already in _Layout.cshtml
+            // Instead, just add quantity validation
+            $('#quantity').on('change', function() {
+                var quantity = parseInt($(this).val());
+                if (quantity <= 0 || isNaN(quantity)) {
+                    showToast('error', 'Error', 'Please select a valid quantity.');
+                    $(this).val(1); // Reset to 1
+                } else if (quantity > @Model.StockQuantity) {
+                    showToast('error', 'Error', 'Quantity cannot exceed available stock (@Model.StockQuantity).');
+                    $(this).val(@Model.StockQuantity); // Set to max
+                }
+            });
+        });
+    </script>
+} 

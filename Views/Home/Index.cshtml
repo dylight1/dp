@@ -1,0 +1,190 @@
+﻿@model IEnumerable<Spode.Models.Product>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Добро пожаловать в Spode</h1>
+            <p class="lead">Найди мерч который хочешь</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <!-- Cart Summary Button will go here in a future implementation -->
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label">Поиск</label>
+                    <div class="input-group">
+                        <input type="text" name="searchTerm" class="form-control" placeholder="Поиск" value="@ViewBag.SearchTerm">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Минимальная цена</label>
+                    <input type="number" name="minPrice" class="form-control" placeholder="Min" value="@ViewBag.MinPrice" min="0" step="0.01">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Максимальная цена</label>
+                    <input type="number" name="maxPrice" class="form-control" placeholder="Max" value="@ViewBag.MaxPrice" min="0" step="0.01">
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <a asp-action="Index" class="btn btn-secondary w-100">Сбросить</a>
+                </div>
+                <input type="hidden" name="page" value="1" />
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var product in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/no-product-image.png" : product.ImageUrl)" 
+                            class="card-img-top" alt="@product.Name" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">@product.Name</h5>
+                            <p class="card-text text-truncate">@product.Description</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="h5 mb-0 text-primary">@product.Price.ToString("C")</span>
+                                <span class="badge @(product.StockQuantity > 10 ? "bg-success" : (product.StockQuantity > 0 ? "bg-warning" : "bg-danger"))">
+                                    @(product.StockQuantity > 0 ? $"{product.StockQuantity} в наличии" : "Распродано")
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-grid gap-2">
+                                <a asp-action="Details" asp-route-id="@product.Id" class="btn btn-outline-primary">
+                                    <i class="fas fa-info-circle me-1"></i> Детали
+                                </a>
+                                @if (product.StockQuantity > 0)
+                                {
+                                    <button type="button" class="btn btn-primary add-to-cart" data-id="@product.Id">
+                                        <i class="fas fa-shopping-cart"></i> Добавить в корзину 
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-secondary" disabled>
+                                        <i class="fas fa-shopping-cart"></i> Распродано
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="alert alert-info">
+                    Ничего не найдено.
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <nav class="mt-4" aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" 
+                           asp-action="Index" 
+                           asp-route-page="1" 
+                           asp-route-searchTerm="@ViewBag.SearchTerm" 
+                           asp-route-minPrice="@ViewBag.MinPrice" 
+                           asp-route-maxPrice="@ViewBag.MaxPrice">First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" 
+                           asp-action="Index" 
+                           asp-route-page="@(ViewBag.CurrentPage - 1)" 
+                           asp-route-searchTerm="@ViewBag.SearchTerm" 
+                           asp-route-minPrice="@ViewBag.MinPrice" 
+                           asp-route-maxPrice="@ViewBag.MaxPrice">Previous</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">First</span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Previous</span>
+                    </li>
+                }
+
+                @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                {
+                    if (i == ViewBag.CurrentPage)
+                    {
+                        <li class="page-item active">
+                            <span class="page-link">@i</span>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link" 
+                               asp-action="Index" 
+                               asp-route-page="@i" 
+                               asp-route-searchTerm="@ViewBag.SearchTerm" 
+                               asp-route-minPrice="@ViewBag.MinPrice" 
+                               asp-route-maxPrice="@ViewBag.MaxPrice">@i</a>
+                        </li>
+                    }
+                }
+
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" 
+                           asp-action="Index" 
+                           asp-route-page="@(ViewBag.CurrentPage + 1)" 
+                           asp-route-searchTerm="@ViewBag.SearchTerm" 
+                           asp-route-minPrice="@ViewBag.MinPrice" 
+                           asp-route-maxPrice="@ViewBag.MaxPrice">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" 
+                           asp-action="Index" 
+                           asp-route-page="@ViewBag.TotalPages" 
+                           asp-route-searchTerm="@ViewBag.SearchTerm" 
+                           asp-route-minPrice="@ViewBag.MinPrice" 
+                           asp-route-maxPrice="@ViewBag.MaxPrice">Last</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">Next</span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Last</span>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>
+
+@section Scripts {
+    <!-- No script needed here as the add-to-cart functionality is handled globally in _Layout.cshtml -->
+}

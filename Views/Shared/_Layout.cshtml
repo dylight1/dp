@@ -1,0 +1,219 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="" />
+    <title>@ViewData["Title"] - Spode</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Spode.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="~/images/favicon.png" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary border-bottom box-shadow sticky-top">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-shopping-bag me-2"></i>Spode
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home me-1"></i>Главная
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="About">
+                                <i class="fas fa-info-circle me-1"></i>О нас
+                            </a>
+                        </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                                    <i class="fas fa-cog me-1"></i>Панель Админа
+                                </a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Privacy">
+                                <i class="fas fa-lock me-1"></i>Политика
+                            </a>
+                        </li>
+                    </ul>
+
+                    <form class="d-flex mx-auto my-2 my-lg-0" asp-controller="Home" asp-action="Index" method="get">
+                        <div class="input-group">
+                            <input type="text" name="searchTerm" class="form-control" placeholder="Поиск"
+                                   aria-label="Search" value="@Context.Request.Query["searchTerm"]" />
+                            <button class="btn btn-light" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="d-flex align-items-center">
+                        <!-- Cart button with item count -->
+                        <a class="btn btn-outline-light me-2 position-relative" asp-controller="Cart" asp-action="Index" id="cart-button">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-count">
+                                0
+                            </span>
+                        </a>
+                        <partial name="_LoginPartial" />
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    
+    <div class="container mt-4">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top mt-5">
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5 class="text-uppercase mb-3">Spode</h5>
+                    <p class="mb-3">Your one-stop shop for all your shopping needs. Quality products at affordable prices.</p>
+                    <div class="social-links">
+                        <a href="#" class="text-white me-2"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                
+                
+                
+                <div class="col-md-2 mb-3 mb-md-0">
+                    <h5 class="text-uppercase mb-3">Support</h5>
+                    <ul class="list-unstyled">
+                        <li><a class="text-white-50" href="#">Contact Us</a></li>
+                        <li><a class="text-white-50" href="#">FAQ</a></li>
+                        <li><a class="text-white-50" href="#">Shipping</a></li>
+                        <li><a class="text-white-50" href="#">Returns</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-4">
+                    <h5 class="text-uppercase mb-3">Newsletter</h5>
+                    <p class="mb-3">Subscribe to receive updates, access to exclusive deals, and more.</p>
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control" placeholder="Your email" aria-label="Your email" />
+                        <button class="btn btn-primary" type="button">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="my-4 bg-light" />
+            
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    &copy; @DateTime.Now.Year - Spode - <a class="text-white-50" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <img src="~/images/payment-methods.png" alt="Payment methods" height="30" />
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    
+    <!-- Handle broken image links -->
+    <script>
+        $(document).ready(function() {
+            // Replace broken product images with default image
+            $('img').on('error', function() {
+                // Check if this is a product image (by looking at its context or classes)
+                // For simplicity, we're replacing all broken images with the product image
+                $(this).attr('src', '/images/no-product-image.png');
+                
+                // Log for debugging
+                console.log('Replaced broken image: ' + $(this).attr('alt'));
+            });
+        });
+    </script>
+    
+    <!-- Cart Summary Script -->
+    <script>
+        $(document).ready(function() {
+            // Function to update cart count
+            function updateCartCount() {
+                $.ajax({
+                    url: '@Url.Action("CartSummary", "Cart")',
+                    type: 'GET',
+                    success: function(data) {
+                        $('#cart-count').text(data.itemCount);
+                    },
+                    error: function() {
+                        console.log('Failed to update cart count');
+                    }
+                });
+            }
+
+            // Update cart count on page load
+            updateCartCount();
+
+            // Global handler for add to cart buttons
+            $('.add-to-cart').click(function(e) {
+                e.preventDefault();
+                var productId = $(this).data('id');
+                var quantity = 1;
+                
+                // Check if we're on a product details page with a quantity input
+                var quantityInput = $('#quantity');
+                if (quantityInput.length > 0) {
+                    quantity = parseInt(quantityInput.val()) || 1;
+                    // Validate quantity
+                    if (quantity <= 0 || isNaN(quantity)) {
+                        showToast('error', 'Error', 'Please select a valid quantity.');
+                        return;
+                    }
+                    // Max quantity validation is done on the input's change event
+                }
+                
+                handleAddToCart(productId, quantity);
+            });
+        });
+    </script>
+    
+    <!-- Toast container for notifications -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+        <div id="toastContainer"></div>
+    </div>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

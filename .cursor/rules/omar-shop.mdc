@@ -1,0 +1,32 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project Workflow
+
+1. Complete a task from `implementation-steps.md`.
+2. Mark the completed task with [x] in `implementation-steps.md`.
+3. Commit changes using the following conventions:
+   - Commit messages should be descriptive and follow this format:
+     [Type] Short description
+   - If the commit relates to an issue, mention it at the end.
+4. Push changes to GitHub.
+5. Before moving to the next task:
+   - Provide clear, step-by-step instructions for manually testing the completed task so it can be verified that everything works correctly.
+6. Move to the next task.
+
+
+# Issue Handling Rules
+
+- If instructed to open an issue, use the MCP to generate it.
+- At the end of every issue description, add:
+  > ASSISTED BY AI — OMAR ABBAS
+
+# Cursor AI Rules
+
+- Only act with clear instructions and verified requirements.
+- Do not proceed if data or requirements are missing; always request clarification.
+- Do not mark any task complete until the implementation is tested and reviewed.
+- Add summaries and next-step suggestions after completing each task.
+- Ensure all code and steps strictly follow `requirements.md`.

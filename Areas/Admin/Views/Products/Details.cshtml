@@ -1,0 +1,78 @@
+@model Spode.Models.Product
+
+@{
+    ViewData["Title"] = "Product Details";
+}
+
+<div class="container-fluid">
+    <h1 class="mt-4">Product Details</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-info-circle me-1"></i>
+            Product Information
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/no-product-image.png" : Model.ImageUrl)" 
+                         alt="@Model.Name" class="img-fluid mb-3" style="max-height: 300px;" />
+                </div>
+                <div class="col-md-8">
+                    <dl class="row">
+                        <dt class="col-sm-3">ID</dt>
+                        <dd class="col-sm-9">@Model.Id</dd>
+                        
+                        <dt class="col-sm-3">Name</dt>
+                        <dd class="col-sm-9">@Model.Name</dd>
+                        
+                        <dt class="col-sm-3">Price</dt>
+                        <dd class="col-sm-9">@Model.Price.ToString("C")</dd>
+                        
+                        <dt class="col-sm-3">Stock</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.StockQuantity > 10)
+                            {
+                                <span class="badge bg-success">@Model.StockQuantity</span>
+                            }
+                            else if (Model.StockQuantity > 0)
+                            {
+                                <span class="badge bg-warning">@Model.StockQuantity</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Out of Stock</span>
+                            }
+                        </dd>
+                        
+                        <dt class="col-sm-3">Description</dt>
+                        <dd class="col-sm-9">
+                            @if (string.IsNullOrEmpty(Model.Description))
+                            {
+                                <span class="text-muted">No description available</span>
+                            }
+                            else
+                            {
+                                @Model.Description
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            
+            <div class="mt-4 d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+                <div>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,122 @@
+@model IEnumerable<Spode.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Your Shopping Cart";
+}
+
+<div class="container mt-4">
+    <h1>Your Shopping Cart</h1>
+    
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            Your cart is empty. <a asp-controller="Home" asp-action="Index" class="alert-link">Continue shopping</a>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th style="width: 150px;">Quantity</th>
+                                <th class="text-end">Subtotal</th>
+                                <th style="width: 50px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="@(string.IsNullOrEmpty(item.Product.ImageUrl) ? "/images/no-product-image.png" : item.Product.ImageUrl)" 
+                                                alt="@item.Product.Name" style="width: 50px; height: 50px; object-fit: cover; margin-right: 15px;" 
+                                                class="rounded">
+                                            <div>
+                                                <a asp-controller="Home" asp-action="Details" asp-route-id="@item.ProductId" class="text-decoration-none">
+                                                    @item.Product.Name
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@item.Product.Price.ToString("C")</td>
+                                    <td>
+                                        <form asp-action="UpdateQuantity" method="post" class="d-flex">
+                                            <input type="hidden" name="productId" value="@item.ProductId">
+                                            <input type="number" name="quantity" value="@item.Quantity" min="1" max="@item.Product.StockQuantity" 
+                                                   class="form-control form-control-sm" style="width: 70px;" onchange="this.form.submit()">
+                                        </form>
+                                    </td>
+                                    <td class="text-end">@((item.Product.Price * item.Quantity).ToString("C"))</td>
+                                    <td>
+                                        <form asp-action="RemoveFromCart" method="post">
+                                            <input type="hidden" name="productId" value="@item.ProductId">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                <td class="text-end"><strong>@ViewBag.TotalPrice.ToString("C")</strong></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between mt-4">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Continue Shopping
+            </a>
+            <div>
+                <a asp-action="ClearCart" class="btn btn-outline-danger me-2">
+                    <i class="fas fa-trash me-1"></i> Clear Cart
+                </a>
+                <a asp-controller="Checkout" asp-action="Index" class="btn btn-primary">
+                    <i class="fas fa-check me-1"></i> Proceed to Checkout
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-close alerts after 5 seconds
+        $(document).ready(function() {
+            window.setTimeout(function() {
+                $(".alert").fadeTo(500, 0).slideUp(500, function() {
+                    $(this).remove();
+                });
+            }, 5000);
+        });
+    </script>
+} 

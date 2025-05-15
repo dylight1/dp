@@ -1,0 +1,189 @@
+@model IEnumerable<Spode.Models.Order>
+
+@{
+    ViewData["Title"] = "Manage Orders";
+}
+
+<div class="container-fluid">
+    <h1 class="mt-4">Manage Orders</h1>
+    
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-filter me-1"></i>
+            Filter Orders
+        </div>
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select" onchange="this.form.submit()">
+                        @foreach (var status in ViewBag.StatusList)
+                        {
+                            <option value="@status" selected="@(status == ViewBag.CurrentStatus)">@status</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="hidden" name="page" value="1" />
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-shopping-cart me-1"></i>
+            Orders
+        </div>
+        <div class="card-body">
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">
+                    No orders found. Try adjusting your filter criteria.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model)
+                            {
+                                <tr>
+                                    <td>@order.Id</td>
+                                    <td>@order.OrderDate.ToString("MM/dd/yyyy HH:mm")</td>
+                                    <td>@order.User.UserName</td>
+                                    <td>
+                                        @switch (order.Status)
+                                        {
+                                            case "Pending":
+                                                <span class="badge bg-warning">@order.Status</span>
+                                                break;
+                                            case "Processing":
+                                                <span class="badge bg-info">@order.Status</span>
+                                                break;
+                                            case "Shipped":
+                                                <span class="badge bg-primary">@order.Status</span>
+                                                break;
+                                            case "Delivered":
+                                                <span class="badge bg-success">@order.Status</span>
+                                                break;
+                                            case "Cancelled":
+                                                <span class="badge bg-danger">@order.Status</span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-secondary">@order.Status</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>@order.TotalPrice.ToString("C")</td>
+                                    <td>
+                                        <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-info-circle"></i> Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                @if (ViewBag.TotalPages > 1)
+                {
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            @if (ViewBag.CurrentPage > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="Index" asp-route-page="1" asp-route-status="@ViewBag.CurrentStatus">First</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)" asp-route-status="@ViewBag.CurrentStatus">Previous</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <span class="page-link">First</span>
+                                </li>
+                                <li class="page-item disabled">
+                                    <span class="page-link">Previous</span>
+                                </li>
+                            }
+
+                            @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                            {
+                                if (i == ViewBag.CurrentPage)
+                                {
+                                    <li class="page-item active">
+                                        <span class="page-link">@i</span>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-status="@ViewBag.CurrentStatus">@i</a>
+                                    </li>
+                                }
+                            }
+
+                            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage + 1)" asp-route-status="@ViewBag.CurrentStatus">Next</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="Index" asp-route-page="@ViewBag.TotalPages" asp-route-status="@ViewBag.CurrentStatus">Last</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <span class="page-link">Next</span>
+                                </li>
+                                <li class="page-item disabled">
+                                    <span class="page-link">Last</span>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-close alerts after 5 seconds
+        $(document).ready(function () {
+            window.setTimeout(function () {
+                $(".alert").fadeTo(500, 0).slideUp(500, function () {
+                    $(this).remove();
+                });
+            }, 5000);
+        });
+    </script>
+} 
